@@ -1,0 +1,11 @@
+# 排除大型子项目文件夹
+GPT-SoVITS/
+
+# 排除本地依赖
+# node_modules/
+npm-debug.log
+
+# 排除音频输出目录
+# audio/
+# TTS_sound/
+# *.wav

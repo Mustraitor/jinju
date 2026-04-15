@@ -1,0 +1,52 @@
+# =========================================
+# 通用忽略
+# =========================================
+.DS_Store
+Thumbs.db
+.env
+*.log
+logs/
+*.tmp
+
+# =========================================
+# Node 后端忽略 (server/)
+# =========================================
+server/node_modules/
+server/dist/
+server/.env
+server/.cache/
+server/uploads/
+server/temp/
+server/logs/
+# 忽略模型文件（AI相关）
+server/model/GPT_weights/
+server/model/SoVITS_weights/
+server/model/sound/
+server/checkpoints/
+server/weights/
+server/**/*.pt
+server/**/*.pth
+server/**/*.ckpt
+server/**/*.bin
+server/**/*.safetensors
+server/audio/
+server/videos/
+server/covers/
+server/TTS_sound/
+GPT-SoVITS/
+# =========================================
+# Vue 前端忽略 (client/)
+# =========================================
+client/node_modules/
+client/dist/
+client/.env
+client/.cache/
+client/.temp/
+client/logs/
+
+# =========================================
+# 系统文件
+# =========================================
+*.swp
+*.swo
+*.tmp

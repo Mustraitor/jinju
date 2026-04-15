@@ -1,0 +1,51 @@
+{
+	"Version": 3,
+	"FileReferences": {
+		"Moc": "尤斯蒂娅.moc3",
+		"Textures": [
+			"尤斯蒂娅.2048/texture_00.png"
+		],
+		"Physics": "尤斯蒂娅.physics3.json",
+		"DisplayInfo": "尤斯蒂娅.cdi3.json",
+		"Motions": {
+			"idle": [
+				{
+					"File":"motions/Eus01.motion3.json"
+				},
+				{
+					"File":"motions/Eus02.motion3.json"
+				},
+				{
+					"File":"motions/Eus03.motion3.json"
+				},
+				{
+					"File":"motions/Eus04.motion3.json"
+				},
+				{
+					"File":"motions/Eus05.motion3.json"
+				},
+				{
+					"File":"motions/Eus06.motion3.json"
+				}
+			]
+		}
+	},
+	"Groups": [
+		{
+			"Target": "Parameter",
+			"Name": "EyeBlink",
+			"Ids": [
+				"ParamEyeLOpen",
+				"ParamEyeROpen"
+			]
+		},
+		{
+			"Target": "Parameter",
+			"Name": "LipSync",
+			"Ids": [
+				"ParamMouthForm",
+				"ParamMouthOpenY"
+			]
+		}
+	]
+}

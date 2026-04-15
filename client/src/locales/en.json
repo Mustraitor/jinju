@@ -1,0 +1,96 @@
+{
+  "header":{
+    "title": "JinSmart",
+    "home": "Home",
+    "classics": "Classics",
+    "agent": "Agent",
+    "graph": "Graph"
+  },
+  "logout": {
+    "confirmTitle": "Sign out?",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "banner": {
+    "slogan": "Inheriting Century-old Charm, Echoing Modern Voices",
+    "subSlogan": "A Digital Transmission Platform for Jinju Powered by AIGC"
+  },
+  "classics": {
+    "sectionTitle": "Classic Repertoire",
+    "synopsis": "Synopsis",
+    "more": "Learn More",
+    "opera1": {
+      "name": "Hitting the Golden Bough",
+      "desc": "Emperor Daizong of Tang betrothed Princess Shengping to Guo Ai. During a grand birthday feast, the Princess's absence sparked a heated argument, leading Guo Ai to strike her in anger. The Emperor, prioritizing family harmony and filial piety, wisely pardoned Guo and counseled the Princess on marital virtues."
+    },
+    "opera2": {
+      "name": "Ascending the Throne",
+      "desc": "With the aid of Princess Daizhan, Xue Pinggui captured Chang'an and ascended the throne. He honored both Wang Baochuan and Daizhan as empresses, rewarded his loyal allies, and dealt justice to his enemies, ultimately achieving a grand reconciliation of power and family."
+    }
+  },
+  "artists": {
+      "title": "Jinju Masters",
+      "learnMore": "Learn More",
+      "list": [
+        {
+          "img": "Ding.jpeg",
+          "name": "Ding Guoxian",
+          "role": "Xusheng (Old Male Role)",
+          "desc": "Ding Guoxian (1909-1972) was a legendary Jinju performing artist and the founder of the Ding School. She pioneered the tradition of female actresses playing 'Xusheng' roles. Her masterpieces include 'The Empty Fort Strategy' and 'Hitting the Golden Bough'."
+        },
+        {
+          "img": "niu.jpg",
+          "name": "Niu Guiying",
+          "role": "Qingyi (Main Female Role)",
+          "desc": "Niu Guiying (1925-2013) was a renowned Jinju artist and the founder of the Niu School. Specializing in 'Qingyi' roles, she was celebrated for her elegant singing and delicate performances. Her representative works include 'Hitting the Golden Bough' and 'Calculating the Grain'."
+        },
+        {
+          "img": "xie.jpeg",
+          "name": "Xie Tao",
+          "role": "Xusheng (Old Male Role)",
+          "desc": "Xie Tao (1967-), a contemporary Jinju performing artist and a national-level inheritor of intangible cultural heritage. She has inherited and further developed the Ding School's artistry. Her famous repertoires include 'Fan Jin Passing the Imperial Exam' and 'Fu Shan Entering Beijing'."
+        },
+        {
+          "img": "song.jpeg",
+          "name": "Song Zhuanzhuan",
+          "role": "Xiaodan (Young Female Role)",
+          "desc": "Song Zhuanzhuan (1960-) is a celebrated Jinju artist famous for her unique 'Zhuanzhuan Melody.' Known for her wide vocal range and distinctive singing style, her masterpieces include 'Du Shiniang' and 'Tears of the Jade Cicada'."
+        },
+        {
+          "img": "guo.jpeg",
+          "name": "Guo Caiping",
+          "role": "Xiaosheng (Young Male Role)",
+          "desc": "Guo Caiping (1944-) is a distinguished Jinju artist specializing in 'Xiaosheng' roles. Her performance style is natural and elegant, complemented by her high-pitched and passionate singing. Her representative works include 'The Small Banquet' and 'The Butterfly Cup'."
+        }
+      ]
+    },
+    "nav": {
+      "logo": "JinSmart",
+      "home": "Home",
+      "classic": "Classics",
+      "log": "History",
+      "save": "Save",
+      "load": "Load",
+      "placeholder": "Type here..."
+    },
+    "save": {
+      "title": "Save",
+      "noData": "NO DATA",
+      "confirmMsg": "Do you want to save?",
+      "yes": "Yes",
+      "no": "No",
+      "back": "Back"
+    },
+    "load": {
+      "title": "Load",
+      "noData": "NO DATA",
+      "confirmMsg": "Do you want to load this save?",
+      "yes": "Yes",
+      "no": "No",
+      "back": "Back"
+    }
+}
+
+
+
+

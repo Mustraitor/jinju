@@ -1,0 +1,106 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>晋韵戏语 - 晋剧AI聊天机器人</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@6.x/dist/pixi.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pixi-live2d-display/dist/index.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap');
+        .jq-font {
+            font-family: 'Ma Shan Zheng', cursive;
+        }
+        .dialog-box {
+            background-image: url('https://picsum.photos/id/1060/800/400');
+            background-size: cover;
+            background-position: center;
+            border: 4px solid #d4a76a;
+            box-shadow: 0 0 15px rgba(212, 167, 106, 0.5);
+        }
+        .log-btn {
+            background: linear-gradient(to right, #8b5a2b, #d4a76a);
+            transition: all 0.3s;
+        }
+        .log-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(139, 90, 43, 0.3);
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col">
+    <header class="bg-red-900 py-4 px-6 shadow-lg">
+        <h1 class="text-3xl jq-font text-center text-yellow-200">晋韵戏语</h1>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 py-8 flex flex-col lg:flex-row">
+        <!-- Live2D角色区域 -->
+        <div class="w-full lg:w-1/2 flex justify-center items-center mb-8 lg:mb-0">
+            <div id="live2d-container" class="w-full h-96 lg:h-full relative">
+                <canvas id="live2d-canvas" class="w-full h-full"></canvas>
+            </div>
+        </div>
+
+        <!-- 对话区域 -->
+        <div class="w-full lg:w-1/2 flex flex-col">
+            <div class="dialog-box rounded-lg p-6 mb-4 h-64 overflow-y-auto flex-grow fade-in">
+                <div id="dialog-content" class="space-y-4">
+                    <div class="bg-black bg-opacity-50 p-3 rounded-lg">
+                        <p class="jq-font text-yellow-100">【晋剧AI】欢迎来到晋剧世界！我是您的戏曲向导，请问您想了解什么？</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex space-x-4 mb-4">
+                <button id="log-btn" class="log-btn px-6 py-2 rounded-full text-white jq-font text-lg">
+                    <i class="fas fa-scroll mr-2"></i>对话记录
+                </button>
+                <button id="voice-btn" class="log-btn px-6 py-2 rounded-full text-white jq-font text-lg">
+                    <i class="fas fa-volume-up mr-2"></i>语音
+                </button>
+            </div>
+
+            <div class="flex">
+                <input type="text" id="user-input" 
+                    class="flex-grow bg-gray-800 border-2 border-yellow-600 rounded-l-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500" 
+                    placeholder="请输入您的问题...">
+                <button id="send-btn" 
+                    class="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-2 rounded-r-lg transition duration-300">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- 对话记录模态框 -->
+    <div id="log-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50">
+        <div class="bg-gray-800 rounded-lg w-11/12 md:w-3/4 lg:w-1/2 max-h-screen overflow-hidden">
+            <div class="bg-red-900 px-6 py-4 flex justify-between items-center">
+                <h2 class="text-xl jq-font text-yellow-200">对话记录</h2>
+                <button id="close-log" class="text-white hover:text-yellow-300">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            <div id="log-content" class="p-6 overflow-y-auto max-h-96">
+                <!-- 对话记录内容将在这里显示 -->
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-red-900 py-4 text-center text-yellow-200 text-sm">
+        <p class="jq-font">© 2025 晋韵戏语 - 晋剧文化传承项目</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

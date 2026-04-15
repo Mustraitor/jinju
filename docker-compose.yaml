@@ -1,0 +1,63 @@
+services:
+  sovits:
+      image: xxxxrt666/gpt-sovits:cu128-lite-20250616-7dec5f
+      container_name: GPT-SoVITS-CU128
+      # 强制指定容器内的工作目录
+      working_dir: /workspace/GPT-SoVITS
+      volumes:
+        # 这里必须确保冒号左边是包含 api_v2.py 的那个文件夹
+        - ./GPT-SoVITS:/workspace/GPT-SoVITS
+      environment:
+        - is_half=true
+      # 【关键修改】：使用绝对路径启动，彻底解决“找不到文件”的问题
+      command: python /workspace/GPT-SoVITS/api_v2.py
+      runtime: nvidia
+      restart: unless-stopped
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: jinju_project
+    ports:
+      - "3305:3306"
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+      - ./server/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  # 3. 缓存 (Redis)
+  redis:
+    image: redis:alpine
+    restart: always
+
+  # 4. 后端服务 (Node.js)
+  backend:
+    build: ./server
+    container_name: node-backend
+    depends_on:
+      - db
+      - redis
+      - sovits
+    environment:
+      - DB_HOST=db
+      - REDIS_HOST=redis
+      - SOVITS_API_URL=http://sovits:9880
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./server:/app/server
+      # # --- 新增这行：挂载宿主机视频文件夹到容器内 ---
+      # - ./server/videos:/app/server/videos
+      # # --- 新增这行：挂载宿主机封面文件夹到容器内 ---
+      # - ./server/covers:/app/server/covers
+    restart: always
+
+  # 5. 前端服务 (Vue)
+  frontend:
+      build: ./client
+      container_name: jinju_project-frontend-1
+      ports:
+        - "80:80"
+      depends_on:
+        - backend
+      restart: always

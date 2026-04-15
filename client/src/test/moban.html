@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>晋韵风华 - 晋剧文化展示</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary-color: #c62b29;
+            --secondary-color: #d4af37;
+            --dark-color: #3a2618;
+            --light-color: #f8f3e6;
+            --accent-color: #8e3b46;
+        }
+        
+        body {
+            font-family: 'Noto Serif SC', serif;
+            background-color: var(--light-color);
+            color: #333;
+            line-height: 1.6;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23f8f3e6"/><path d="M0,50 Q25,30 50,50 T100,50" fill="none" stroke="%23d4af3733" stroke-width="2"/></svg>');
+            background-size: 120px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* 头部样式 */
+        header {
+            background: linear-gradient(to right, var(--dark-color), var(--primary-color));
+            padding: 15px 0;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo h1 {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 2.8rem;
+            color: var(--secondary-color);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            letter-spacing: 3px;
+        }
+        
+        .logo-icon {
+            font-size: 3rem;
+            color: var(--secondary-color);
+            margin-right: 15px;
+            animation: rotate 10s linear infinite;
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        nav ul li {
+            margin-left: 25px;
+        }
+        
+        nav ul li a {
+            text-decoration: none;
+            color: var(--light-color);
+            font-size: 1.1rem;
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        nav ul li a:hover {
+            background-color: var(--secondary-color);
+            color: var(--dark-color);
+        }
+        
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--secondary-color);
+            transition: width 0.3s ease;
+        }
+        
+        nav ul li a:hover::after {
+            width: 100%;
+        }
+        
+        /* 英雄区域 */
+        .hero {
+            position: relative;
+            height: 80vh;
+            background: linear-gradient(rgba(58, 38, 24, 0.7), rgba(58, 38, 24, 0.7)), 
+                        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400"><rect width="400" height="400" fill="%233a2618"/><path d="M0,200 Q100,100 200,200 T400,200" fill="none" stroke="%23c62b2977" stroke-width="8"/></svg>');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--light-color);
+            overflow: hidden;
+        }
+        
+        .hero-content {
+            max-width: 800px;
+            z-index: 2;
+        }
+        
+        .hero-content h2 {
+            font-size: 4.5rem;
+            font-family: 'Ma Shan Zheng', cursive;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+            color: var(--secondary-color);
+            letter-spacing: 5px;
+        }
+        
+        .hero-content p {
+            font-size: 1.4rem;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--secondary-color);
+            color: var(--dark-color);
+            padding: 12px 30px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            border: 2px solid var(--secondary-color);
+        }
+        
+        .btn:hover {
+            background-color: transparent;
+            color: var(--secondary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+        }
+        
+        .hero-pattern {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120"><path d="M0,0 L120,0 L120,120 L0,120 Z" fill="none" stroke="%23d4af3722" stroke-width="2"/><circle cx="60" cy="60" r="20" fill="none" stroke="%23d4af3722" stroke-width="1"/></svg>');
+            z-index: 1;
+        }
+        
+        /* 内容区域 */
+        .section {
+            padding: 80px 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+        }
+        
+        .section-title h2 {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 3.5rem;
+            color: var(--primary-color);
+            display: inline-block;
+            padding: 0 20px;
+            background-color: var(--light-color);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(to right, transparent, var(--secondary-color), transparent);
+            z-index: 1;
+        }
+        
+        .section-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+        }
+        
+        /* 简介部分 */
+        .intro-content {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .intro-text {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .intro-text h3 {
+            font-size: 2rem;
+            color: var(--dark-color);
+            margin-bottom: 20px;
+            border-left: 5px solid var(--secondary-color);
+            padding-left: 15px;
+        }
+        
+        .intro-text p {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            text-align: justify;
+        }
+        
+        .intro-image {
+            flex: 1;
+            min-width: 300px;
+            height: 400px;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .intro-image::before {
+            content: '';
+            position: absolute;
+            width: 80%;
+            height: 80%;
+            border: 3px solid var(--secondary-color);
+            border-radius: 10px;
+            z-index: 2;
+        }
+        
+        .intro-image i {
+            font-size: 15rem;
+            color: rgba(212, 175, 55, 0.2);
+        }
+        
+        /* 剧目部分 */
+        .play-card {
+            width: 350px;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .play-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .play-image {
+            height: 200px;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .play-image i {
+            font-size: 8rem;
+            color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .play-content {
+            padding: 25px;
+        }
+        
+        .play-content h3 {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+        }
+        
+        .play-content p {
+            color: #555;
+            margin-bottom: 15px;
+        }
+        
+        .play-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        
+        .tag {
+            background-color: var(--light-color);
+            color: var(--primary-color);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            border: 1px solid var(--secondary-color);
+        }
+        
+        /* 艺术家部分 */
+        .artists {
+            background: linear-gradient(rgba(198, 43, 41, 0.05), rgba(198, 43, 41, 0.05)), 
+                        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23f8f3e6"/><circle cx="50" cy="50" r="30" fill="none" stroke="%23d4af3722" stroke-width="2"/></svg>');
+            background-size: 80px;
+        }
+        
+        .artist-slider {
+            display: flex;
+            overflow-x: auto;
+            gap: 30px;
+            padding: 20px 0;
+            scrollbar-width: thin;
+            scrollbar-color: var(--secondary-color) var(--light-color);
+        }
+        
+        .artist-slider::-webkit-scrollbar {
+            height: 8px;
+        }
+        
+        .artist-slider::-webkit-scrollbar-thumb {
+            background-color: var(--secondary-color);
+            border-radius: 4px;
+        }
+        
+        .artist-card {
+            min-width: 280px;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .artist-card:hover {
+            transform: scale(1.05);
+        }
+        
+        .artist-header {
+            height: 180px;
+            background: linear-gradient(to right, var(--dark-color), var(--primary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .artist-header i {
+            font-size: 6rem;
+            color: rgba(212, 175, 55, 0.5);
+        }
+        
+        .artist-info {
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .artist-info h3 {
+            font-size: 1.6rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .artist-info p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+        
+        /* 特点部分 */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            font-size: 3.5rem;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.6rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        
+        .feature-card p {
+            color: #555;
+        }
+        
+        /* 页脚 */
+        footer {
+            background: linear-gradient(to right, var(--dark-color), var(--primary-color));
+            color: var(--light-color);
+            padding: 50px 0 20px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .footer-column h3 {
+            font-size: 1.5rem;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background-color: var(--secondary-color);
+        }
+        
+        .footer-column p, .footer-column a {
+            color: #ddd;
+            margin-bottom: 10px;
+            display: block;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-column a:hover {
+            color: var(--secondary-color);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(212, 175, 55, 0.2);
+            border-radius: 50%;
+            color: var(--secondary-color);
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            background-color: var(--secondary-color);
+            color: var(--dark-color);
+            transform: translateY(-3px);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(212, 175, 55, 0.3);
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+            }
+            
+            nav ul {
+                margin-top: 15px;
+            }
+            
+            nav ul li {
+                margin: 0 8px;
+            }
+            
+            .hero-content h2 {
+                font-size: 2.8rem;
+            }
+            
+            .section-title h2 {
+                font-size: 2.5rem;
+            }
+            
+            .intro-image {
+                height: 300px;
+            }
+            
+            .play-card {
+                width: 100%;
+            }
+        }
+        
+        /* 动画效果 */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- 头部区域 -->
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <i class="fas fa-theater-masks logo-icon floating"></i>
+                <h1>晋韵风华</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#"><i class="fas fa-home"></i> 首页</a></li>
+                    <li><a href="#"><i class="fas fa-history"></i> 历史</a></li>
+                    <li><a href="#"><i class="fas fa-mask"></i> 剧目</a></li>
+                    <li><a href="#"><i class="fas fa-user"></i> 艺术家</a></li>
+                    <li><a href="#"><i class="fas fa-images"></i> 图集</a></li>
+                    <li><a href="#"><i class="fas fa-envelope"></i> 联系</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 英雄区域 -->
+    <section class="hero">
+        <div class="hero-pattern"></div>
+        <div class="container hero-content">
+            <h2>晋剧 · 三晋之韵</h2>
+            <p>山西梆子，黄土高原的文化瑰宝，四百年传承的艺术经典</p>
+            <a href="#" class="btn"><i class="fas fa-play-circle"></i> 探索晋剧世界</a>
+        </div>
+    </section>
+
+    <!-- 简介部分 -->
+    <section class="section">
+        <div class="container">
+            <div class="section-title">
+                <h2>晋剧简介</h2>
+            </div>
+            <div class="intro-content">
+                <div class="intro-text">
+                    <h3>山西戏曲的代表</h3>
+                    <p>晋剧，又称山西梆子，是山西省的主要地方戏曲剧种，流行于山西、陕西、内蒙古、河北等地区。它形成于清代中叶，至今已有三百多年的历史。</p>
+                    <p>晋剧音乐属于梆子腔系统，唱腔高亢激越、朴实奔放，既有北方剧种的豪迈，又不失细腻婉转的韵味。其表演形式丰富多样，注重程式化表演，讲究"四功五法"。</p>
+                    <p>晋剧行当分生、旦、净、丑四大类，各行当都有独特的表演程式和声腔特点。在长期发展中，形成了中路梆子、北路梆子、蒲州梆子、上党梆子四大流派。</p>
+                    <p>2006年，晋剧被列入第一批国家级非物质文化遗产名录，成为中华民族宝贵的文化财富。</p>
+                </div>
+                <div class="intro-image">
+                    <i class="fas fa-dragon floating"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 经典剧目 -->
+    <section class="section" style="background-color: #fcf8f0;">
+        <div class="container">
+            <div class="section-title">
+                <h2>经典剧目</h2>
+            </div>
+            <div class="section-content">
+                <!-- 剧目卡片 1 -->
+                <div class="play-card">
+                    <div class="play-image">
+                        <i class="fas fa-crown floating"></i>
+                    </div>
+                    <div class="play-content">
+                        <h3>打金枝</h3>
+                        <p>唐代宗时期，汾阳王郭子仪寿诞，七子八婿皆来拜寿，唯六子郭暧之妻升平公主未至。郭暧回宫怒打公主，引发一场宫廷风波...</p>
+                        <div class="play-tags">
+                            <span class="tag">宫廷戏</span>
+                            <span class="tag">历史剧</span>
+                            <span class="tag">经典</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 剧目卡片 2 -->
+                <div class="play-card">
+                    <div class="play-image">
+                        <i class="fas fa-female floating"></i>
+                    </div>
+                    <div class="play-content">
+                        <h3>算粮登殿</h3>
+                        <p>薛平贵与王宝钏的爱情故事。薛平贵西征归来，王宝钏苦守寒窑十八载。薛平贵登殿后，王宝钏在武家坡算粮，夫妻团圆...</p>
+                        <div class="play-tags">
+                            <span class="tag">爱情</span>
+                            <span class="tag">家庭</span>
+                            <span class="tag">传统</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 剧目卡片 3 -->
+                <div class="play-card">
+                    <div class="play-image">
+                        <i class="fas fa-gem floating"></i>
+                    </div>
+                    <div class="play-content">
+                        <h3>金水桥</h3>
+                        <p>秦英在金水桥钓鱼，与路过的詹太师发生争执，失手将其打死。詹妃上殿哭诉，银屏公主绑子上殿，经过一番曲折...</p>
+                        <div class="play-tags">
+                            <span class="tag">宫廷</span>
+                            <span class="tag">伦理</span>
+                            <span class="tag">经典</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 著名艺术家 -->
+    <section class="section artists">
+        <div class="container">
+            <div class="section-title">
+                <h2>著名艺术家</h2>
+            </div>
+            <div class="artist-slider">
+                <!-- 艺术家卡片 1 -->
+                <div class="artist-card">
+                    <div class="artist-header">
+                        <i class="fas fa-user-tie floating"></i>
+                    </div>
+                    <div class="artist-info">
+                        <h3>丁果仙</h3>
+                        <p>"晋剧须生泰斗"，创立了丁派艺术，代表剧目《空城计》、《芦花》等</p>
+                    </div>
+                </div>
+                
+                <!-- 艺术家卡片 2 -->
+                <div class="artist-card">
+                    <div class="artist-header">
+                        <i class="fas fa-user floating"></i>
+                    </div>
+                    <div class="artist-info">
+                        <h3>牛桂英</h3>
+                        <p>晋剧表演艺术家，牛派创始人，代表剧目《打金枝》、《算粮》等</p>
+                    </div>
+                </div>
+                
+                <!-- 艺术家卡片 3 -->
+                <div class="artist-card">
+                    <div class="artist-header">
+                        <i class="fas fa-user-alt floating"></i>
+                    </div>
+                    <div class="artist-info">
+                        <h3>王爱爱</h3>
+                        <p>"晋剧皇后"，爱爱腔创始人，代表剧目《算粮》、《打金枝》等</p>
+                    </div>
+                </div>
+                
+                <!-- 艺术家卡片 4 -->
+                <div class="artist-card">
+                    <div class="artist-header">
+                        <i class="fas fa-user-ninja floating"></i>
+                    </div>
+                    <div class="artist-info">
+                        <h3>郭兰英</h3>
+                        <p>著名晋剧表演艺术家，后成为民族歌唱家，代表剧目《金水桥》等</p>
+                    </div>
+                </div>
+                
+                <!-- 艺术家卡片 5 -->
+                <div class="artist-card">
+                    <div class="artist-header">
+                        <i class="fas fa-user-graduate floating"></i>
+                    </div>
+                    <div class="artist-info">
+                        <h3>谢涛</h3>
+                        <p>当代晋剧表演艺术家，梅花奖得主，代表剧目《傅山进京》等</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 艺术特点 -->
+    <section class="section">
+        <div class="container">
+            <div class="section-title">
+                <h2>艺术特点</h2>
+            </div>
+            <div class="features">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-music floating"></i>
+                    </div>
+                    <h3>唱腔艺术</h3>
+                    <p>晋剧唱腔高亢激越，朴实奔放，板式丰富多变，旋律优美动听。其独特的"花腔"、"二音"等演唱技巧极具特色。</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mask floating"></i>
+                    </div>
+                    <h3>脸谱艺术</h3>
+                    <p>晋剧脸谱色彩鲜明，图案夸张，富有象征意义。不同颜色代表不同人物性格，如红色忠勇、黑色刚直、白色奸诈等。</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-tshirt floating"></i>
+                    </div>
+                    <h3>服饰道具</h3>
+                    <p>晋剧服饰华丽精美，遵循明代服饰风格。蟒袍、靠旗、凤冠等道具制作考究，色彩鲜艳，富有民族特色。</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-hands floating"></i>
+                    </div>
+                    <h3>表演程式</h3>
+                    <p>晋剧表演讲究"四功五法"，即唱、念、做、打和手、眼、身、法、步。程式化动作丰富，富有表现力和艺术美感。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>关于我们</h3>
+                    <p>晋韵风华致力于晋剧文化的保护、传承与推广，让这一古老艺术在新时代焕发新光彩。</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-weixin"></i></a>
+                        <a href="#"><i class="fab fa-weibo"></i></a>
+                        <a href="#"><i class="fab fa-tiktok"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>快速链接</h3>
+                    <a href="#">晋剧历史</a>
+                    <a href="#">经典剧目</a>
+                    <a href="#">名角介绍</a>
+                    <a href="#">演出资讯</a>
+                    <a href="#">学习资源</a>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>联系我们</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> 山西省太原市迎泽区晋剧艺术中心</p>
+                    <p><i class="fas fa-phone"></i> 0351-XXXXXXX</p>
+                    <p><i class="fas fa-envelope"></i> info@jinyunfenghua.com</p>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>微信公众号</h3>
+                    <p>扫码关注我们，获取最新演出资讯和晋剧知识</p>
+                    <div style="background: white; width: 120px; height: 120px; display: flex; align-items: center; justify-content: center; margin-top: 10px;">
+                        <i class="fas fa-qrcode" style="font-size: 5rem; color: var(--dark-color);"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2023 晋韵风华 - 晋剧文化传承平台 | 晋ICP备XXXXXX号</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 简单的滚动效果增强
+        document.addEventListener('DOMContentLoaded', function() {
+            // 添加卡片悬停效果
+            const cards = document.querySelectorAll('.play-card, .artist-card, .feature-card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.zIndex = 10;
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.zIndex = 1;
+                });
+            });
+            
+            // 添加导航滚动效果
+            const navLinks = document.querySelectorAll('nav a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // 在实际应用中这里应该滚动到对应部分
+                    alert('在实际应用中，这里会滚动到对应内容区域');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

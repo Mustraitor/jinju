@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>晋韵聊戏 - 晋剧风格聊天机器人</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', 'SimHei', sans-serif;
+        }
+        
+        :root {
+            --primary-red: #c62f2f;
+            --golden: #d4af37;
+            --dark-red: #8c1d1d;
+            --light-gold: #f8e9a1;
+            --bg-color: #f5e9d4;
+            --text-dark: #3a2618;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #2c0a0a 0%, #1a0606 100%);
+            color: var(--text-dark);
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* 传统图案背景 */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle, rgba(198, 47, 47, 0.1) 1px, transparent 1px),
+                radial-gradient(circle, rgba(212, 175, 55, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            opacity: 0.3;
+            z-index: -1;
+        }
+        
+        .container {
+            display: flex;
+            max-width: 1400px;
+            height: 90vh;
+            margin: 5vh auto;
+            background: rgba(245, 233, 212, 0.9);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 3px solid var(--golden);
+            position: relative;
+        }
+        
+        /* 传统装饰边框 */
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 2px solid var(--primary-red);
+            border-radius: 10px;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        /* Live2D区域 */
+        .character-container {
+            flex: 0 0 40%;
+            background: linear-gradient(to bottom, var(--dark-red) 0%, #5a1717 100%);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-right: 3px solid var(--golden);
+        }
+        
+        .character-placeholder {
+            width: 80%;
+            height: 80%;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--light-gold);
+            text-align: center;
+            padding: 20px;
+            border: 2px dashed var(--golden);
+        }
+        
+        .character-placeholder i {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            color: var(--golden);
+        }
+        
+        .character-info {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: var(--light-gold);
+            padding: 10px;
+            background: rgba(140, 29, 29, 0.7);
+        }
+        
+        .character-info h2 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+        
+        .character-info p {
+            font-size: 1.1rem;
+            font-style: italic;
+        }
+        
+        /* 聊天区域 */
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        /* 顶部标题 */
+        .chat-header {
+            background: linear-gradient(to right, var(--dark-red) 0%, var(--primary-red) 100%);
+            color: var(--light-gold);
+            padding: 15px 25px;
+            text-align: center;
+            position: relative;
+            border-bottom: 2px solid var(--golden);
+        }
+        
+        .chat-header h1 {
+            font-size: 2.2rem;
+            letter-spacing: 3px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .chat-header::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 5%;
+            width: 90%;
+            height: 20px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 10"><path d="M0,0 Q25,10 50,0 T100,0" fill="%23d4af37" /></svg>') center bottom no-repeat;
+            background-size: 100% 100%;
+        }
+        
+        /* 对话区域 */
+        .dialogue-area {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" opacity="0.05"><rect width="100" height="100" fill="none" stroke="%23c62f2f" stroke-width="2"/></svg>');
+        }
+        
+        .message {
+            max-width: 75%;
+            margin-bottom: 25px;
+            padding: 15px 20px;
+            border-radius: 12px;
+            position: relative;
+            animation: fadeIn 0.3s ease-out;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            line-height: 1.6;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .bot-message {
+            background: linear-gradient(135deg, #f9f2e7 0%, #f0e6d2 100%);
+            border: 1px solid #e0c9a6;
+            border-left: 5px solid var(--primary-red);
+            margin-right: auto;
+        }
+        
+        .user-message {
+            background: linear-gradient(135deg, #e6f7ff 0%, #d1ecff 100%);
+            border: 1px solid #b8daff;
+            border-right: 5px solid #1e88e5;
+            margin-left: auto;
+        }
+        
+        .message::after {
+            content: "";
+            position: absolute;
+            width: 0;
+            height: 0;
+        }
+        
+        .bot-message::after {
+            left: -15px;
+            top: 15px;
+            border: 8px solid transparent;
+            border-right: 8px solid #f0e6d2;
+        }
+        
+        .user-message::after {
+            right: -15px;
+            top: 15px;
+            border: 8px solid transparent;
+            border-left: 8px solid #d1ecff;
+        }
+        
+        .message-content {
+            font-size: 1.1rem;
+            color: var(--text-dark);
+        }
+        
+        .message-time {
+            font-size: 0.8rem;
+            color: #888;
+            text-align: right;
+            margin-top: 8px;
+        }
+        
+        /* 输入区域 */
+        .input-area {
+            padding: 20px;
+            background: linear-gradient(to top, #e8d9bd 0%, #dcc9a8 100%);
+            border-top: 2px solid var(--golden);
+            display: flex;
+            gap: 15px;
+        }
+        
+        .input-area input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid var(--primary-red);
+            border-radius: 30px;
+            outline: none;
+            font-size: 1.1rem;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .input-area button {
+            padding: 15px 25px;
+            background: linear-gradient(to bottom, var(--primary-red) 0%, var(--dark-red) 100%);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .input-area button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+            background: linear-gradient(to bottom, #d43c3c 0%, #9c1a1a 100%);
+        }
+        
+        /* 日志按钮 */
+        .log-button {
+            position: absolute;
+            bottom: 100px;
+            right: 30px;
+            background: var(--golden);
+            color: var(--dark-red);
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.3s;
+        }
+        
+        .log-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+        
+        /* 日志面板 */
+        .log-panel {
+            position: absolute;
+            top: 0;
+            right: -450px;
+            width: 450px;
+            height: 100%;
+            background: rgba(245, 233, 212, 0.95);
+            z-index: 20;
+            transition: transform 0.4s ease-in-out;
+            border-left: 3px solid var(--golden);
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .log-panel.active {
+            transform: translateX(-450px);
+        }
+        
+        .log-header {
+            background: linear-gradient(to right, var(--dark-red) 0%, var(--primary-red) 100%);
+            color: var(--light-gold);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .log-header h2 {
+            font-size: 1.5rem;
+        }
+        
+        .close-log {
+            background: none;
+            border: none;
+            color: var(--light-gold);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .log-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .log-entry {
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.8);
+            border-left: 4px solid var(--primary-red);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .log-entry.user {
+            border-left-color: #1e88e5;
+            background: rgba(225, 245, 254, 0.8);
+        }
+        
+        .log-message {
+            margin-bottom: 5px;
+            font-size: 1rem;
+        }
+        
+        .log-time {
+            font-size: 0.8rem;
+            color: #777;
+            text-align: right;
+        }
+        
+        /* 晋剧元素装饰 */
+        .decoration {
+            position: absolute;
+            z-index: 0;
+        }
+        
+        .decoration-1 {
+            top: 10px;
+            left: 10px;
+            width: 80px;
+            height: 80px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="%23c62f2f" d="M50,5 C60,5 70,10 77,20 C85,30 90,40 90,50 C90,60 85,70 77,80 C70,90 60,95 50,95 C40,95 30,90 23,80 C15,70 10,60 10,50 C10,40 15,30 23,20 C30,10 40,5 50,5 Z M50,25 C45,25 40,30 40,35 C40,40 45,45 50,45 C55,45 60,40 60,35 C60,30 55,25 50,25 Z"/></svg>');
+            opacity: 0.2;
+        }
+        
+        .decoration-2 {
+            bottom: 20px;
+            right: 20px;
+            width: 120px;
+            height: 120px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="%23d4af37" d="M50,10 C70,10 90,20 90,40 C90,60 70,70 50,70 C30,70 10,60 10,40 C10,20 30,10 50,10 Z M50,30 C45,30 40,35 40,40 C40,45 45,50 50,50 C55,50 60,45 60,40 C60,35 55,30 50,30 Z"/></svg>');
+            opacity: 0.15;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 1200px) {
+            .container {
+                flex-direction: column;
+                height: 95vh;
+                margin: 2.5vh auto;
+            }
+            
+            .character-container {
+                flex: 0 0 250px;
+                border-right: none;
+                border-bottom: 3px solid var(--golden);
+            }
+            
+            .log-panel {
+                width: 100%;
+                right: -100%;
+            }
+            
+            .log-panel.active {
+                transform: translateX(-100%);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 装饰元素 -->
+    <div class="decoration decoration-1"></div>
+    <div class="decoration decoration-2"></div>
+    
+    <div class="container">
+        <!-- Live2D角色区域 -->
+        <div class="character-container">
+            <div class="character-placeholder">
+                <i class="fas fa-user-alt"></i>
+                <h3>Live2D 晋剧角色展示区</h3>
+                <p>此处将集成晋剧人物Live2D模型</p>
+            </div>
+            <div class="character-info">
+                <h2>晋剧名角 - 王玉梅</h2>
+                <p>晋剧青衣，国家一级演员，非物质文化遗产传承人</p>
+            </div>
+        </div>
+        
+        <!-- 聊天区域 -->
+        <div class="chat-container">
+            <div class="chat-header">
+                <h1>晋韵聊戏</h1>
+            </div>
+            
+            <div class="dialogue-area" id="dialogueArea">
+                <!-- 初始问候 -->
+                <div class="message bot-message">
+                    <div class="message-content">
+                        您好！我是晋剧聊天机器人玉梅。山西梆子、晋剧文化，我都能和您畅聊。您想了解晋剧的哪方面内容呢？
+                    </div>
+                    <div class="message-time">现在</div>
+                </div>
+                
+                <!-- 示例对话1 -->
+                <div class="message user-message">
+                    <div class="message-content">
+                        我想了解晋剧的起源和历史
+                    </div>
+                    <div class="message-time">现在</div>
+                </div>
+                
+                <!-- 示例对话2 -->
+                <div class="message bot-message">
+                    <div class="message-content">
+                        晋剧，又称山西梆子，起源于明末清初的山西中部。它是在蒲州梆子的基础上，融合晋中民歌、秧歌等民间艺术发展而成。清代咸丰年间基本定型，至今已有300多年历史。
+                    </div>
+                    <div class="message-time">现在</div>
+                </div>
+                
+                <!-- 示例对话3 -->
+                <div class="message user-message">
+                    <div class="message-content">
+                        晋剧有哪些经典剧目？
+                    </div>
+                    <div class="message-time">现在</div>
+                </div>
+                
+                <!-- 示例对话4 -->
+                <div class="message bot-message">
+                    <div class="message-content">
+                        晋剧经典剧目丰富，代表作品有《打金枝》、《金水桥》、《算粮》、《下河东》、《游西湖》等。其中《打金枝》最为著名，讲述了唐代宗之女升平公主与驸马郭暧的故事，展现了晋剧独特的艺术魅力。
+                    </div>
+                    <div class="message-time">现在</div>
+                </div>
+            </div>
+            
+            <!-- 输入区域 -->
+            <div class="input-area">
+                <input type="text" id="userInput" placeholder="请输入您想了解的晋剧内容...">
+                <button id="sendButton">
+                    <i class="fas fa-paper-plane"></i> 发送
+                </button>
+            </div>
+            
+            <!-- 日志按钮 -->
+            <button class="log-button" id="logButton">
+                <i class="fas fa-book"></i>
+            </button>
+            
+            <!-- 日志面板 -->
+            <div class="log-panel" id="logPanel">
+                <div class="log-header">
+                    <h2>对话日志</h2>
+                    <button class="close-log" id="closeLog">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="log-content" id="logContent">
+                    <!-- 日志内容将通过JavaScript动态添加 -->
+                    <div class="log-entry bot">
+                        <div class="log-message">您好！我是晋剧聊天机器人玉梅。山西梆子、晋剧文化，我都能和您畅聊。您想了解晋剧的哪方面内容呢？</div>
+                        <div class="log-time">2023-06-15 10:00:00</div>
+                    </div>
+                    <div class="log-entry user">
+                        <div class="log-message">我想了解晋剧的起源和历史</div>
+                        <div class="log-time">2023-06-15 10:01:23</div>
+                    </div>
+                    <div class="log-entry bot">
+                        <div class="log-message">晋剧，又称山西梆子，起源于明末清初的山西中部。它是在蒲州梆子的基础上，融合晋中民歌、秧歌等民间艺术发展而成。清代咸丰年间基本定型，至今已有300多年历史。</div>
+                        <div class="log-time">2023-06-15 10:01:45</div>
+                    </div>
+                    <div class="log-entry user">
+                        <div class="log-message">晋剧有哪些经典剧目？</div>
+                        <div class="log-time">2023-06-15 10:02:15</div>
+                    </div>
+                    <div class="log-entry bot">
+                        <div class="log-message">晋剧经典剧目丰富，代表作品有《打金枝》、《金水桥》、《算粮》、《下河东》、《游西湖》等。其中《打金枝》最为著名，讲述了唐代宗之女升平公主与驸马郭暧的故事，展现了晋剧独特的艺术魅力。</div>
+                        <div class="log-time">2023-06-15 10:02:40</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dialogueArea = document.getElementById('dialogueArea');
+            const userInput = document.getElementById('userInput');
+            const sendButton = document.getElementById('sendButton');
+            const logButton = document.getElementById('logButton');
+            const logPanel = document.getElementById('logPanel');
+            const closeLog = document.getElementById('closeLog');
+            const logContent = document.getElementById('logContent');
+            
+            // 发送消息
+            sendButton.addEventListener('click', sendMessage);
+            userInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            // 切换日志面板
+            logButton.addEventListener('click', function() {
+                logPanel.classList.add('active');
+            });
+            
+            closeLog.addEventListener('click', function() {
+                logPanel.classList.remove('active');
+            });
+            
+            // 发送消息函数
+            function sendMessage() {
+                const message = userInput.value.trim();
+                if (message === '') return;
+                
+                // 添加用户消息到对话区域
+                addMessageToDialogue(message, 'user');
+                
+                // 添加用户消息到日志
+                addMessageToLog(message, 'user');
+                
+                // 清空输入框
+                userInput.value = '';
+                
+                // 模拟机器人回复
+                setTimeout(function() {
+                    const botResponses = [
+                        "晋剧的唱腔高亢激昂，又不失婉转细腻，分为乱弹、腔儿和曲子三大类。",
+                        "晋剧的脸谱艺术非常丰富，不同颜色代表不同人物性格，红色表忠勇，黑色表刚直，白色表奸诈。",
+                        "晋剧的伴奏乐器主要有呼胡、二弦、三弦、四弦，称为"四大件"，其中呼胡是主奏乐器。",
+                        "晋剧表演讲究"四功五法"，四功指唱、念、做、打；五法指手、眼、身、法、步。",
+                        "晋剧名家丁果仙被誉为"晋剧须生大王"，对晋剧艺术发展做出了重大贡献。",
+                        "晋剧《打金枝》中"劝宫"一折最为经典，展现了晋剧细腻的情感表达和精湛的表演艺术。",
+                        "现代晋剧也在不断创新，涌现出《傅山进京》、《于成龙》等优秀新编历史剧。"
+                    ];
+                    
+                    const botMessage = botResponses[Math.floor(Math.random() * botResponses.length)];
+                    
+                    // 添加机器人回复到对话区域
+                    addMessageToDialogue(botMessage, 'bot');
+                    
+                    // 添加机器人回复到日志
+                    addMessageToLog(botMessage, 'bot');
+                }, 1000);
+            }
+            
+            // 添加消息到对话区域
+            function addMessageToDialogue(message, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message');
+                messageDiv.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
+                
+                const messageContent = document.createElement('div');
+                messageContent.classList.add('message-content');
+                messageContent.textContent = message;
+                
+                const messageTime = document.createElement('div');
+                messageTime.classList.add('message-time');
+                messageTime.textContent = '现在';
+                
+                messageDiv.appendChild(messageContent);
+                messageDiv.appendChild(messageTime);
+                
+                dialogueArea.appendChild(messageDiv);
+                
+                // 滚动到底部
+                dialogueArea.scrollTop = dialogueArea.scrollHeight;
+            }
+            
+            // 添加消息到日志
+            function addMessageToLog(message, sender) {
+                const logEntry = document.createElement('div');
+                logEntry.classList.add('log-entry');
+                logEntry.classList.add(sender);
+                
+                const logMessage = document.createElement('div');
+                logMessage.classList.add('log-message');
+                logMessage.textContent = message;
+                
+                const now = new Date();
+                const logTime = document.createElement('div');
+                logTime.classList.add('log-time');
+                logTime.textContent = now.toLocaleString();
+                
+                logEntry.appendChild(logMessage);
+                logEntry.appendChild(logTime);
+                
+                logContent.appendChild(logEntry);
+                
+                // 滚动到底部
+                logContent.scrollTop = logContent.scrollHeight;
+            }
+            
+            // 初始滚动到底部
+            dialogueArea.scrollTop = dialogueArea.scrollHeight;
+            logContent.scrollTop = logContent.scrollHeight;
+        });
+    </script>
+</body>
+</html>

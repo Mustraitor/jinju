@@ -1,0 +1,32 @@
+[
+    {
+        "character-name": "丁果仙",
+        "role": "须生",
+        "description": "丁果仙（1909-1972），晋剧表演艺术家，晋剧丁派创始人。她开创了晋剧坤角扮演须生的先河，代表剧目有《空城计》、《打金枝》等。",
+        "imgPath": "@/assets/image/character/Ding.jpeg"
+    },
+    {
+        "character-name": "牛桂英",
+        "role": "青衣",
+        "description": "牛桂英（1925-2013），晋剧表演艺术家，晋剧牛派创始人。她以青衣行当见长，唱腔优美，表演细腻，代表剧目有《打金枝》、《算粮》等。",
+        "imgPath": "@/assets/image/character/niu.jpg"
+    },
+    {
+        "character-name": "谢涛",
+        "role": "须生",
+        "description": "谢涛（1967-），当代晋剧表演艺术家，国家级非物质文化遗产传承人。她继承并发展了丁派艺术，代表剧目有《范进中举》、《傅山进京》等。",
+        "imgPath": "@/assets/image/character/xie.jpeg"
+    },
+    {
+        "character-name": "宋转转",
+        "role": "小旦",
+        "description": "宋转转（1960-），晋剧表演艺术家，以'转转腔'闻名。她音域宽广，唱腔独特，代表剧目有《杜十娘》、《玉蝉泪》等。",
+        "imgPath": "@/assets/image/character/song.jpeg"
+    },
+    {
+        "character-name": "郭彩萍",
+        "role": "小生",
+        "description": "郭彩萍（1944-），晋剧表演艺术家，工小生。她表演风格潇洒大方，唱腔高亢激昂，代表剧目有《小宴》、《蝴蝶杯》等。",
+        "imgPath": "@/assets/image/character/guo.jpeg"
+    }
+]
