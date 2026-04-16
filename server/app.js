@@ -34,8 +34,6 @@ app.use(cors({
 
 app.use(express.json())
 
-// app.use('/videos', express.static(path.join(process.cwd(), 'videos')))
-// app.use('/covers', express.static(path.join(process.cwd(), 'covers')))
 
 app.use('/videos', express.static(path.join(process.cwd(), 'videos')));
 app.use('/covers', express.static(path.join(process.cwd(), 'covers')));

@@ -1,7 +1,16 @@
 <script setup>
 import fetchWrapper from '@/utils/fetchWrapper'
 import { ref } from 'vue'
-const props = defineProps([ 'textList', 'audioUrl'])
+const props = defineProps({
+    textList: {
+        type: Array,
+        default: () => []
+    },
+    audioUrl: {
+        type: Array,
+        default: () => []
+    }
+})
 const audio = ref()
 
 //删除音频对象
@@ -13,14 +22,19 @@ const deleteAudio = () => {
  
 }
 const handleAudio = async (index) => {
+    const audioPath = props.audioUrl?.[index]
+    if (!audioPath) {
+        return
+    }
     deleteAudio()
-    // console.log(audioUrl);
-    // console.log(audioUrl[index]);
-    console.log(props.audioUrl[index]);
     
-    const response = await fetchWrapper(props.audioUrl[index])
-    audio.value = new Audio(response)
-    audio.value.play()
+    try {
+        const response = await fetchWrapper(audioPath)
+        audio.value = new Audio(response)
+        await audio.value.play()
+    } catch (error) {
+        console.error('音频播放失败:', error)
+    }
     
 }
 
@@ -47,7 +61,7 @@ const handleAudio = async (index) => {
                      AI
                 </div>
                 <div class="dialog">{{ item.AI }} </div>
-                <div class="replay" @click="handleAudio(index)">
+                <div class="replay" v-if="props.audioUrl[index]" @click="handleAudio(index)">
                     <img src="@/assets/image/icon_volume.svg" alt="#">
                 </div>
             </div>

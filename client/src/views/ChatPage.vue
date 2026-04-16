@@ -195,37 +195,41 @@ const addlist = async () => {
   }
 }
 
-const TTS = async (text) => {
-  try {
-    if (!ENABLE_TTS.value) return;
-      const response = await chatApi.textToSpeech(text);
-      // 1. 处理 BaseURL：去掉末尾的斜杠
-    const baseUrl = import.meta.env.VITE_APP_API_URL.replace(/\/$/, '');
+// const TTS = async (text) => {
+//   try {
+//     if (!ENABLE_TTS.value) return;
+//       const response = await chatApi.textToSpeech(text);
+//       if (response?.disabled || !response?.filePath) {
+//         loading.value = false;
+//         return;
+//       }
+//       // 1. 处理 BaseURL：去掉末尾的斜杠
+//     const baseUrl = (import.meta.env.VITE_APP_API_URL || '').replace(/\/$/, '');
     
-    // 2. 处理 FilePath：确保开头有一个斜杠
-    const filePath = response.filePath.startsWith('/') 
-                     ? response.filePath 
-                     : `/${response.filePath}`;
+//     // 2. 处理 FilePath：确保开头有一个斜杠
+//     const filePath = response.filePath.startsWith('/') 
+//                      ? response.filePath 
+//                      : `/${response.filePath}`;
 
-    const audioPath = `${baseUrl}${filePath}`;
+//     const audioPath = `${baseUrl}${filePath}`;
   
-      audioInstance.src = audioPath;
-      audioInstance.onplay = () => { loading.value = true; };
-      audioInstance.onended = () => { loading.value = false; };
-      audioInstance.onerror = (e) => { 
-          console.error("音频播放错", e); 
-          loading.value = false; 
-      };
+//       audioInstance.src = audioPath;
+//       audioInstance.onplay = () => { loading.value = true; };
+//       audioInstance.onended = () => { loading.value = false; };
+//       audioInstance.onerror = (e) => { 
+//           console.error("音频播放错", e); 
+//           loading.value = false; 
+//       };
 
-      await initAudioSystem();
-      await audioInstance.play();
+//       await initAudioSystem();
+//       await audioInstance.play();
       
-      saveTTS(response.filePath);
-  } catch (e) {
-      console.error("TTS Error", e);
-      loading.value = false;
-  }
-}
+//       saveTTS(response.filePath);
+//   } catch (e) {
+//       console.error("TTS Error", e);
+//       loading.value = false;
+//   }
+// }
 
 const centerModel = () => {
   if (!app || !model) return;
@@ -244,13 +248,18 @@ const toHome = () => router.push("/home");
 const isLog = ref(false);
 const handleLog = () => { isLog.value = !isLog.value; buttonSound(); };
 const audioUrl = ref([]);
-const saveTTS = (url) => audioUrl.value.push(url);
+const saveTTS = (url) => {
+  if (url) {
+    audioUrl.value.push(url);
+  }
+};
 const isSave = ref(false);
 const handleSave = async () => { isSave.value = true; buttonSound(); await loadData(); };
 const isLoad = ref(false);
 const handleLoad = async () => { isLoad.value = true; buttonSound(); await loadData(); };
 const title = ref([]);
 const timestamp = ref([]);
+const EMPTY_SLOT_COUNT = 9;
 
 
 const handleCurrentAudio = async () => {
@@ -268,7 +277,7 @@ const handleCurrentAudio = async () => {
     if (!latestUrl) return
 
     // 4. 处理 URL 拼接（确保路径正确）
-    const baseUrl = import.meta.env.VITE_APP_API_URL.replace(/\/$/, '');
+    const baseUrl = (import.meta.env.VITE_APP_API_URL || '').replace(/\/$/, '');
     const filePath = latestUrl.startsWith('/') ? latestUrl : `/${latestUrl}`;
     const audioPath = `${baseUrl}${filePath}`;
 
@@ -297,12 +306,27 @@ const handleCurrentAudio = async () => {
 
 const loadData = async () => {
   const response = await chatApi.getLoadList();
-  console.log(response.data);
+  const slots = Array.isArray(response.data) ? response.data : [];
+
+  title.value = Array(EMPTY_SLOT_COUNT).fill('');
+  timestamp.value = Array(EMPTY_SLOT_COUNT).fill('');
   
-  response.data.forEach((i, index) => {
-    if(i){
-      title.value[index] = i.textList[i.textList.length - 1].user;
-      timestamp.value[index] = localTime(i.timestamp);
+  slots.forEach((slotData) => {
+    const slotIndex = Number(slotData?.slot) - 1;
+    if (slotIndex < 0 || slotIndex >= EMPTY_SLOT_COUNT) {
+      return;
+    }
+
+    const latestMessage = Array.isArray(slotData?.textList)
+      ? slotData.textList[slotData.textList.length - 1]
+      : null;
+
+    if (latestMessage?.user) {
+      title.value[slotIndex] = latestMessage.user;
+    }
+
+    if (slotData?.timestamp) {
+      timestamp.value[slotIndex] = localTime(slotData.timestamp);
     }
   });
 };
@@ -310,10 +334,23 @@ const loadData = async () => {
 const loadDialogData = async (index) => { 
   buttonSound();
   const response = await chatApi.getLoadList();
-  const data = response.data;
-  audioUrl.value = data[index].audioUrl;
-  textList.value = data[index].textList;
-  conversation_id.value = data[index].conversation_id;
+  const data = Array.isArray(response.data) ? response.data : [];
+  const slotData = data[index];
+
+  if (!slotData) {
+    return;
+  }
+
+  audioUrl.value = Array.isArray(slotData.audioUrl) ? slotData.audioUrl : [];
+  textList.value = Array.isArray(slotData.textList) ? slotData.textList : [];
+  conversation_id.value = slotData.conversation_id || conversation_id.value;
+  id = textList.value.reduce((maxId, item) => Math.max(maxId, Number(item?.id) || 0), 0);
+  AImessage.value = textList.value[textList.value.length - 1]?.AI || '';
+
+  if (showTextbox.value) {
+    showTextbox.value.style.display = textList.value.length > 0 ? 'block' : 'none';
+    showTextbox.value.textContent = AImessage.value;
+  }
 };
 
 const saveData = async (slotIndex) => {
@@ -321,11 +358,13 @@ const saveData = async (slotIndex) => {
     conversation_id: conversation_id.value,
     slot: slotIndex + 1,
     timestamp: new Date().toISOString(),
-    data: { textList: textList.value, audioUrl: audioUrl.value }
+    data: { textList: textList.value, audioUrl: audioUrl.value || [] }
   }
-  if(payload.data.audioUrl.length > 0) { 
+  console.log("即将要存档的数据", payload);
+  
+  if(payload.data.textList.length > 0) { 
     await chatApi.saveData(payload);
-    loadData();
+    await loadData();
   }
 };
 
@@ -337,7 +376,7 @@ const saveData = async (slotIndex) => {
 <div class="logo" @click="toHome">{{ $t('nav.logo') }}</div>
 <div class="textBox" v-show="AImessage !== ''" >
   <span class="text-content" ref="showTextbox"></span>
-  <span class="inline-replay" @click="handleCurrentAudio" v-if="!loading">
+  <span class="inline-replay" @click="handleCurrentAudio" v-if="!loading && ENABLE_TTS && audioUrl.length > 0">
     <img src="@/assets/image/icon_volume.svg" alt="播放" />
   </span>
 </div>

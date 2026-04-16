@@ -11,9 +11,7 @@ import { useRouter } from 'vue-router'
 const baseURL = import.meta.env.VITE_APP_API_URL || '';
 
 const getImageUrl = (url) => {
-  if (!url) return '';
-  // 如果数据库存的是 /covers/xxx.jpg，我们需要拼接上域名
-  // encodeURI 会处理中文和中括号，但不会破坏 / 和 :
+  if (!url) return '';  
   return encodeURI(`${baseURL}${url}`);
 };
 
@@ -109,7 +107,7 @@ const handleDeleteUser = (row) => {
     {
       confirmButtonText: '确定删除',
       cancelButtonText: '取消',
-      type: 'error', // 使用 error 类型图标，视觉提醒更强
+      type: 'error', 
       confirmButtonClass: 'el-button--danger'
     }
   )
@@ -139,13 +137,10 @@ const handleDeleteUser = (row) => {
 
 const handleRoleChange = async (id, newRole) => {
   try {
-    // 调用之前在 adminApi 里补全的 updateUserRole
     const res = await adminApi.updateUserRole(id, newRole)
     
     if (res.status === 0) {
       ElMessage.success('身份权限更新成功')
-      // 可选：重新拉取列表以确保状态同步
-      // fetchUserList() 
     } else {
       ElMessage.error(res.message || '更新失败')
       // 如果失败了，建议重新拉取列表回滚前端显示的状态
@@ -291,8 +286,6 @@ const submitSubtitle = async () => {
         subtitles
       });
 
-      // ✨【关键修复】在这里处理后端返回的结果
-      // 注意：根据你 fetchVideoData 的逻辑，后端成功码应该是 0
       if (res && (res.code === 0 || res.status === 0)) {
         ElMessage.success("字幕导入成功！");
         
@@ -309,7 +302,7 @@ const submitSubtitle = async () => {
       }
 
     } catch (err) {
-      console.error("❌ 流程异常：", err);
+      console.error("流程异常：", err);
       ElMessage.error(`操作失败: ${err.message}`);
     }
   };
@@ -397,7 +390,7 @@ onMounted(() => {
             <el-table-column label="封面预览" width="160" align="center">
               <template #default="scope">
                 <el-image 
-                  :src="getImageUrl(scope.row.cover_url)" 
+                  :src="getImageUrl(scope.row.cover)" 
                   :preview-src-list="[getImageUrl(scope.row.cover_url)]"
                   :initial-index="0"
                   fit="cover" 

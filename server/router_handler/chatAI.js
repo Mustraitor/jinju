@@ -376,7 +376,9 @@ export const initData = async (req, res) => {
 }
 export const saveData = async (req, res) => {
   const user_id = req.auth.id
-  const { conversation_id, slot, timestamp, data } = req.body
+  const { conversation_id, slot, timestamp, data = {} } = req.body
+  const textList = Array.isArray(data.textList) ? data.textList : []
+  const audioUrl = Array.isArray(data.audioUrl) ? data.audioUrl : []
   const timestampDate = new Date(timestamp)
 
   if (isNaN(timestampDate.getTime())) {
@@ -387,6 +389,9 @@ export const saveData = async (req, res) => {
       `SELECT id FROM save_data WHERE user_id = ? AND slot = ?`,
       [user_id, slot]
   );
+  if (!saveRow) {
+      return res.status(404).json({ error: 'Save slot not found' });
+  }
   const saveDataId = saveRow.id;
 
   // 1. 更新 save_data 元信息
@@ -397,7 +402,7 @@ export const saveData = async (req, res) => {
 
   // 2. 写入 message
   await pool.query(`DELETE FROM save_data_message WHERE save_data_id = ?`, [saveDataId]);
-  for (const item of data.textList) {
+  for (const item of textList) {
       await insertMessage(saveDataId, {
           message_id: item.id,
           user: item.user,
@@ -411,6 +416,13 @@ export const saveData = async (req, res) => {
 //       await insertAudio(saveDataId, audio);
 //   }
 //   deleteTTSFile().catch(err => console.error("清理冗余文件失败:", err));
+  await pool.query(`DELETE FROM save_data_audio WHERE save_data_id = ?`, [saveDataId]);
+  for (const audio of audioUrl) {
+      if (audio) {
+          await insertAudio(saveDataId, audio);
+      }
+  }
+  deleteTTSFile().catch(err => console.error("娓呯悊鍐椾綑鏂囦欢澶辫触:", err));
   res.json({ message: 'success' });
 
 }

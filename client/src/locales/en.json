@@ -4,7 +4,8 @@
     "home": "Home",
     "classics": "Classics",
     "agent": "Agent",
-    "graph": "Graph"
+    "graph": "Graph",
+    "video": "videos"
   },
   "logout": {
     "confirmTitle": "Sign out?",

@@ -4,7 +4,8 @@
     "home": "首页",
     "classics": "经典回味",
     "agent": "晋韵小智",
-    "graph": "知识图谱"
+    "graph": "知识图谱",
+    "video": "视频"
   },
   "logout": {
     "confirmTitle": "退出登录？",

@@ -46,6 +46,7 @@ const isYes = () => {
             <router-link to="/music"><li>{{ $t('header.classics') }}</li></router-link>
             <router-link to="/chatAI"><li>{{ $t('header.agent') }}</li></router-link>
             <router-link to="/graph"><li>{{ $t('header.graph') }}</li></router-link>
+            <router-link to="/video"><li>{{ $t('header.video') }}</li></router-link>
             <li class="username" @click="handleConfirm">{{ username }}</li>
             <Translate/>
         </ul>
