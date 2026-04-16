@@ -58,5 +58,12 @@ export const adminApi = {
     return request('/admin/syncVideos', {
       method: 'POST'
     });
+  },
+  importSubtitles(data){
+    return request('/admin/importSubtitles', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data) 
+    });
   }
 }

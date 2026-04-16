@@ -1,3 +1,4 @@
+use jinju_project;
 CREATE TABLE user (
     id        int auto_increment primary key,
     username  varchar(255)      null,
@@ -90,7 +91,22 @@ CREATE TABLE relations (
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE subtitles (
+       id INT PRIMARY KEY AUTO_INCREMENT,
+       video_id INT NOT NULL,
+       start_time FLOAT NOT NULL,
+       end_time FLOAT NOT NULL,
+       content TEXT NOT NULL,
+      FOREIGN KEY (video_id) REFERENCES videos(id)
+      ON DELETE CASCADE
+      ON UPDATE CASCADE
+);
 
-
-
-
+CREATE TABLE subtitle_translations (
+       id INT PRIMARY KEY AUTO_INCREMENT,
+       subtitle_id INT NOT NULL,
+       content TEXT NOT NULL,
+       FOREIGN KEY (subtitle_id) REFERENCES subtitles(id)
+      ON DELETE CASCADE
+      ON UPDATE CASCADE
+);

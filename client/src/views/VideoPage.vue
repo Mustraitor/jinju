@@ -1,13 +1,14 @@
 <script setup>
-import fetchWrapper from "@/utils/fetchWrapper";
+// import fetchWrapper from "@/utils/fetchWrapper";
+import { videoApi } from "@/api/video";
 import { onMounted, ref } from "vue";
 import { useRouter } from 'vue-router'
 const videoList = ref([]);
 // 获取环境变量或硬编码后端地址
-const BASE_URL = import.meta.env.VITE_APP_API_URL.replace(/\/$/, '')
+const BASE_URL = (import.meta.env.VITE_APP_API_URL || '').replace(/\/$/, '')
 
 onMounted(async() => {
-  const res = await fetchWrapper('/video/list');
+  const res = await videoApi.getVideoList();
   console.log(res);
   
   if (res && res.code === 0) {

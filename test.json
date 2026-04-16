@@ -1,0 +1,17 @@
+{
+  "video_id": "1",
+  "subtitles": [
+    {
+      "start_time": 23,
+      "end_time": 47,
+      "content": "有来",
+      "translation": "我这位君王走下大殿"
+    },
+    {
+      "start_time": 48,
+      "end_time": 60,
+      "content": "……",
+      "translation": "……"
+    }
+  ]
+}

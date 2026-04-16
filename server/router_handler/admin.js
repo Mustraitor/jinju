@@ -147,42 +147,145 @@ export const importGraphData = async (req, res) => {
 
 export const syncVideos = async (req, res) => {
   const conn = await pool.getConnection();
+
   try {
     const videoDir = path.join(process.cwd(), 'videos');
     const coverDir = path.join(process.cwd(), 'covers');
-    
-    // 1. 扫描文件夹
-    const files = fs.readdirSync(videoDir).filter(f => ['.mp4', '.mov', '.webm', '.mkv'].includes(path.extname(f)));
-    
-    await conn.beginTransaction();
-    // 清空原视频数据（或者按你脚本里的 ON DUPLICATE KEY 逻辑）
-    await conn.query("TRUNCATE TABLE videos");
 
-    for (const file of files) {
+    const files = fs.readdirSync(videoDir).filter(f =>
+      ['.mp4', '.mov', '.webm', '.mkv'].includes(path.extname(f))
+    );
+
+    const [dbVideos] = await conn.query("SELECT id, video_url FROM videos");
+
+    const dbMap = new Map(
+      dbVideos.map(v => [v.video_url, v.id])
+    );
+
+    const fileSet = new Set(files.map(f => `/videos/${f}`));
+
+    // =========================
+    // 1️⃣ 删除数据库中“文件不存在”的记录
+    // =========================
+    const toDelete = dbVideos.filter(v => !fileSet.has(v.video_url));
+
+    for (const v of toDelete) {
+      await conn.query("DELETE FROM videos WHERE id = ?", [v.id]);
+    }
+
+    // =========================
+    // 2️⃣ 插入新文件
+    // =========================
+    const newFiles = files.filter(f =>
+      !dbMap.has(`/videos/${f}`)
+    );
+
+    let inserted = 0;
+
+    for (const file of newFiles) {
       const title = path.parse(file).name;
       const coverName = `${title}.jpg`;
-      
-      // 2. 调用 FFmpeg 截取封面 (这里建议用异步 Promise)
+
       await new Promise((resolve) => {
         ffmpeg(path.join(videoDir, file))
-          .screenshots({ count: 1, timemarks: ['2'], filename: coverName, folder: coverDir, size: '320x?' })
+          .screenshots({
+            count: 1,
+            timemarks: ['2'],
+            filename: coverName,
+            folder: coverDir,
+            size: '320x?'
+          })
           .on('end', resolve)
-          .on('error', resolve); // 出错也继续，防止卡死
+          .on('error', resolve);
       });
 
-      // 3. 写入数据库
       await conn.query(
-        "INSERT INTO videos (title, play_id, description, cover_url, video_url) VALUES (?, ?, ?, ?, ?)",
-        [title, 0, `${title}`, `/covers/${coverName}`, `/videos/${file}`]
+        `INSERT INTO videos (title, play_id, description, cover_url, video_url)
+         VALUES (?, ?, ?, ?, ?)`,
+        [title, 0, title, `/covers/${coverName}`, `/videos/${file}`]
       );
+
+      inserted++;
     }
-    
-    await conn.commit();
-    res.json({ status: 0, message: `成功同步 ${files.length} 个视频` });
+
+    res.json({
+      status: 0,
+      message: `新增 ${inserted} 个视频，删除 ${toDelete.length} 个无效记录`
+    });
+
   } catch (err) {
-    await conn.rollback();
     res.json({ status: 1, message: err.message });
   } finally {
     conn.release();
   }
 };
+
+
+export const importSubtitles = async (req, res) => {
+  const conn = await pool.getConnection()
+
+  try {
+    const { video_id, subtitles = [] } = req.body
+  // console.log("🔥 后端收到 req.body：", req.body);
+    await conn.beginTransaction()
+
+    // 1️⃣ 删除旧字幕（包括翻译）
+    await conn.query(
+      `DELETE st FROM subtitle_translations st
+       JOIN subtitles s ON st.subtitle_id = s.id
+       WHERE s.video_id = ?`,
+      [video_id]
+    )
+
+    await conn.query(
+      "DELETE FROM subtitles WHERE video_id = ?",
+      [video_id]
+    )
+
+    // 2️⃣ 批量插入字幕
+    const values = subtitles.map(s => [
+      video_id,
+      s.start_time,
+      s.end_time,
+      s.content
+    ])
+
+    if (values.length > 0) {
+      const [result] = await conn.query(
+        `INSERT INTO subtitles (video_id, start_time, end_time, content)
+         VALUES ?`,
+        [values]
+      )
+
+      // 3️⃣ 插入翻译
+      const firstId = result.insertId
+
+      const transValues = subtitles.map((s, i) => [
+        firstId + i,
+        s.translation || ""
+      ])
+
+      await conn.query(
+        `INSERT INTO subtitle_translations (subtitle_id, content)
+         VALUES ?`,
+        [transValues]
+      )
+    }
+
+    await conn.commit()
+
+    res.json({
+      code: 0,
+      msg: "字幕更新成功"
+    })
+
+  } catch (err) {
+    await conn.rollback()
+    res.json({
+      code: 1,
+      msg: err.message
+    })
+  } finally {
+    conn.release()
+  }
+}

@@ -1,210 +1,10 @@
-<template>
-  <div class="admin-layout">
-    <el-container style="height: 100vh;">
-      <el-aside width="220px" class="aside-menu">
-        <div class="admin-logo">晋韵智传-后台</div>
-        <el-menu 
-          :default-active="activeMenu" 
-          background-color="#304156" 
-          text-color="#fff"
-          @select="handleMenuSelect"
-        >
-
-          <el-menu-item index="3">
-            <el-icon><User /></el-icon>
-            <span>用户管理</span>
-          </el-menu-item>
-          <el-menu-item index="2">
-            <el-icon><UploadFilled /></el-icon>
-            <span>知识图谱管理</span>
-          </el-menu-item>
-          <el-menu-item index="1">
-            <el-icon><DataBoard /></el-icon>
-            <span>晋剧视频管理</span>
-          </el-menu-item>
-
-        </el-menu>
-      </el-aside>
-
-      <el-container>
-        <el-header class="admin-header">
-          <div class="header-left"></div>
-            <div class="header-right">
-              <el-tag effect="dark" type="danger" style="margin-right: 15px;">管理员模式</el-tag>
-              <el-dropdown @command="handleCommand">
-                <div class="avatar-wrapper" style="cursor: pointer; outline: none;">
-                  <el-avatar :size="32" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
-                </div>
-                <template #dropdown> <el-dropdown-menu>
-                    <el-dropdown-item command="logout" style="color: #f56c6c;">退出登录</el-dropdown-item>
-                  </el-dropdown-menu>
-                </template>
-              </el-dropdown>
-            </div>
-        </el-header>
-
-        <el-main class="admin-main">
-          <!-- 视频管理 -->
-          <el-card v-if="activeMenu === '1'" class="video-asset-card">
-            <template #header>
-              <div class="card-header">
-                <div class="header-left">
-                  <el-icon :size="20" style="vertical-align: middle; margin-right: 8px; color: #409eff;">
-                    <VideoCamera />
-                  </el-icon>
-                  <span class="header-title"></span>
-                </div>
-                <el-button type="danger" @click="handleSyncVideos" :loading="videoLoading" plain>
-                  <el-icon style="margin-right: 4px;"><Refresh /></el-icon> 扫描服务器并重构索引
-                </el-button>
-              </div>
-            </template>
-
-          <el-table 
-            :data="videoList" 
-            v-loading="videoLoading" 
-            stripe 
-            style="width: 100%;" 
-            max-height="500"
-          >
-            <el-table-column label="封面预览" width="160" align="center">
-              <template #default="scope">
-                <el-image 
-                  :src="getImageUrl(scope.row.cover_url)" 
-                  :preview-src-list="[getImageUrl(scope.row.cover_url)]"
-                  :initial-index="0"
-                  fit="cover" 
-                  class="video-cover"
-                  style="width: 120px; height: 80px; border-radius: 4px; cursor: pointer;"
-                  preview-teleported
-                >
-                  <template #error>
-                    <div class="image-slot" style="display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; background: #f5f7fa; color: #909399; font-size: 12px;">
-                      加载失败
-                    </div>
-                  </template>
-                </el-image>
-              </template>
-            </el-table-column>
-
-            <el-table-column prop="title" label="剧目名称" min-width="200">
-              <template #default="scope">
-                <div style="font-weight: bold; color: #333;">{{ scope.row.title }}</div>
-                <div style="font-size: 12px; color: #999; margin-top: 4px;">
-                  <span>{{ scope.row.description || '暂无描述' }}</span>
-                </div>
-              </template>
-            </el-table-column>
-
-            <!-- <el-table-column label="操作" width="150" align="center">
-              <template #default="scope">
-                <el-button link type="primary" @click="handleEdit(scope.row)">编辑</el-button>
-                <el-button link type="danger" @click="handleDelete(scope.row)">删除</el-button>
-              </template>
-            </el-table-column> -->
-          </el-table>
-          </el-card>
-          <!-- 知识图谱管理 -->
-          <el-card v-if="activeMenu === '2'" class="import-card">
-            <template #header>
-              <div class="card-header">
-                <span>非遗知识图谱 - 自动化同步中枢</span>
-              </div>
-            </template>
-            <div class="upload-section">
-              <el-upload
-                class="upload-demo"
-                drag
-                action="#" 
-                :auto-upload="false"
-                :on-change="handleFileChange"
-                accept=".xlsx, .xls"
-              >
-                <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-                <div class="el-upload__text">将《晋剧知识.xlsx》拖到此处，或<em>点击上传</em></div>
-              </el-upload>
-            </div>
-            <el-button type="primary" @click="submitUpload" :loading="syncLoading" style="margin-top: 20px">
-                开始解析并同步到数据库
-            </el-button>
-          </el-card>
-          <!-- 用户管理 -->
-          <el-card v-if="activeMenu === '3'" class="user-card">
-            <template #header>
-              <div class="card-header">
-                <span>平台用户管理</span>
-                <el-button type="primary" size="small" @click="addDialogVisible = true">新增账号</el-button>
-              </div>
-            </template>
-            <el-table :data="mockUsers" stripe style="width: 100%">
-              <el-table-column prop="id" label="UID" width="80" />
-              <el-table-column label="头像" width="80">
-                <template #default="scope">
-                  <el-avatar :size="30" :src="scope.row.user_pic || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'" />
-                </template>
-              </el-table-column>
-              <el-table-column prop="username" label="用户名" />
-              <el-table-column label="身份标识">
-                <template #default="scope">
-                  <el-select 
-                    v-model="scope.row.user_type" 
-                    size="small"
-                    style="width: 120px;"
-                    @change="(val) => handleRoleChange(scope.row.id, val)"
-                  >
-                    <el-option label="普通研究员" :value="0" />
-                    <el-option label="系统管理员" :value="1" />
-                  </el-select>
-                </template>
-              </el-table-column>
-              <el-table-column label="操作" width="180">
-                <template #default="scope">
-                  <el-button size="small" link type="primary">编辑</el-button>
-                  <el-button 
-                    v-if="scope.row.user_type === 0"
-                    size="small" 
-                    link 
-                    type="danger" 
-                    @click="handleDeleteUser(scope.row)"
-                  >删除</el-button>
-                </template>
-              </el-table-column>
-            </el-table>
-          </el-card>
-          <!-- 添加用户弹窗 -->
-          <el-dialog v-model="addDialogVisible" title="添加用户" width="30%" @close="resetAddForm">
-            <el-form :model="addUserForm" :rules="addRules" ref="addUserRef" label-width="80px">
-              <el-form-item label="用户名" prop="username">
-                <el-input v-model="addUserForm.username" placeholder="请输入登录账号" />
-              </el-form-item>
-              <el-form-item label="初始密码" prop="password">
-                <el-input v-model="addUserForm.password" type="password" show-password placeholder="建议6位以上" />
-              </el-form-item>
-              <el-form-item label="身份权限">
-                <el-select v-model="addUserForm.user_type" placeholder="请选择">
-                  <el-option label="普通研究员" :value="0" />
-                  <el-option label="系统管理员" :value="1" />
-                </el-select>
-              </el-form-item>
-            </el-form>
-            <template #footer>
-              <el-button @click="addDialogVisible = false">取消</el-button>
-              <el-button type="primary" @click="submitAddUser" :loading="submitLoading">确认创建</el-button>
-            </template>
-          </el-dialog>
-        </el-main>
-      </el-container>
-    </el-container>
-  </div>
-</template>
-
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { adminApi } from '@/api/admin'
 import { videoApi } from '@/api/video'
 import { useUserStore } from '@/stores/user'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { DataBoard, UploadFilled, User, VideoCamera, Refresh } from '@element-plus/icons-vue'
+import { DataBoard, UploadFilled, User, VideoCamera, Refresh, Upload } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
 
 // 获取环境变量中的 API 地址
@@ -442,11 +242,327 @@ const handleSyncVideos = async () => {
   }
 }
 
+
+
+const subtitleDialogVisible = ref(false)
+const currentVideo = ref(null)
+const subtitleFile = ref(null)
+const uploadRef = ref(null)
+const openSubtitleDialog = (row) => {
+  currentVideo.value = row   
+  subtitleDialogVisible.value = true
+}
+const handleFileChange2 = (file) => {
+  subtitleFile.value = file.raw
+}
+
+const submitSubtitle = async () => {
+  if (!subtitleFile.value || !currentVideo.value) {
+    return ElMessage.warning("请先选择文件");
+  }
+
+  const reader = new FileReader();
+  
+  reader.onload = async (e) => {
+    try {
+      let rawText = e.target.result;
+      
+      // 1. 处理 BOM 字符
+      if (rawText.charCodeAt(0) === 0xFEFF) {
+        rawText = rawText.slice(1);
+      }
+
+      // 2. 解析 JSON
+      const data = JSON.parse(rawText);
+      const subtitles = data.subtitles;
+
+      if (!Array.isArray(subtitles)) {
+        return ElMessage.error("JSON 格式不正确：缺少 subtitles 数组");
+      }
+
+      console.log("🚀 准备发送给后端的数据对象：", {
+        video_id: currentVideo.value.id,
+        subtitles: subtitles
+      });
+
+      // 3. 发送请求
+      const res = await adminApi.importSubtitles({
+        video_id: currentVideo.value.id,
+        subtitles
+      });
+
+      // ✨【关键修复】在这里处理后端返回的结果
+      // 注意：根据你 fetchVideoData 的逻辑，后端成功码应该是 0
+      if (res && (res.code === 0 || res.status === 0)) {
+        ElMessage.success("字幕导入成功！");
+        
+        // 4. 关闭弹窗
+        subtitleDialogVisible.value = false;
+        
+        // 5. 清空当前文件，防止重复上传
+        subtitleFile.value = null;
+        if (uploadRef.value) uploadRef.value.clearFiles();
+        
+      } else {
+        // 如果后端返回了错误码（比如数据库插入失败）
+        ElMessage.error(res.msg || res.message || "后端保存失败");
+      }
+
+    } catch (err) {
+      console.error("❌ 流程异常：", err);
+      ElMessage.error(`操作失败: ${err.message}`);
+    }
+  };
+
+  reader.readAsText(subtitleFile.value);
+};
+
+
+
 onMounted(() => {
   fetchVideoData()
 })
 
 </script>
+
+<template>
+  <div class="admin-layout">
+    <el-container style="height: 100vh;">
+      <el-aside width="220px" class="aside-menu">
+        <div class="admin-logo">晋韵智传-后台</div>
+        <el-menu 
+          :default-active="activeMenu" 
+          background-color="#304156" 
+          text-color="#fff"
+          @select="handleMenuSelect"
+        >
+
+          <el-menu-item index="3">
+            <el-icon><User /></el-icon>
+            <span>用户管理</span>
+          </el-menu-item>
+          <el-menu-item index="2">
+            <el-icon><UploadFilled /></el-icon>
+            <span>知识图谱管理</span>
+          </el-menu-item>
+          <el-menu-item index="1">
+            <el-icon><DataBoard /></el-icon>
+            <span>晋剧视频管理</span>
+          </el-menu-item>
+
+        </el-menu>
+      </el-aside>
+
+      <el-container>
+        <el-header class="admin-header">
+          <div class="header-left"></div>
+            <div class="header-right">
+              <el-tag effect="dark" type="danger" style="margin-right: 15px;">管理员模式</el-tag>
+              <el-dropdown @command="handleCommand">
+                <div class="avatar-wrapper" style="cursor: pointer; outline: none;">
+                  <el-avatar :size="32" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
+                </div>
+                <template #dropdown> <el-dropdown-menu>
+                    <el-dropdown-item command="logout" style="color: #f56c6c;">退出登录</el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+            </div>
+        </el-header>
+
+        <el-main class="admin-main">
+          <!-- 视频管理 -->
+          <el-card v-if="activeMenu === '1'" class="video-asset-card">
+            <template #header>
+              <div class="card-header">
+                <div class="header-left">
+                  <el-icon :size="20" style="vertical-align: middle; margin-right: 8px; color: #409eff;">
+                    <VideoCamera />
+                  </el-icon>
+                  <span class="header-title"></span>
+                </div>
+                <el-button type="danger" @click="handleSyncVideos" :loading="videoLoading" plain>
+                  <el-icon style="margin-right: 4px;"><Refresh /></el-icon> 扫描服务器并重构索引
+                </el-button>
+              </div>
+            </template>
+
+          <el-table 
+            :data="videoList" 
+            v-loading="videoLoading" 
+            stripe 
+            style="width: 100%;" 
+            max-height="500"
+          >
+            <el-table-column label="封面预览" width="160" align="center">
+              <template #default="scope">
+                <el-image 
+                  :src="getImageUrl(scope.row.cover_url)" 
+                  :preview-src-list="[getImageUrl(scope.row.cover_url)]"
+                  :initial-index="0"
+                  fit="cover" 
+                  class="video-cover"
+                  style="width: 120px; height: 80px; border-radius: 4px; cursor: pointer;"
+                  preview-teleported
+                >
+                  <template #error>
+                    <div class="image-slot" style="display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; background: #f5f7fa; color: #909399; font-size: 12px;">
+                      加载失败
+                    </div>
+                  </template>
+                </el-image>
+              </template>
+            </el-table-column>
+
+            <el-table-column prop="title" label="剧目名称" min-width="200">
+              <template #default="scope">
+                <div style="font-weight: bold; color: #333;">{{ scope.row.title }}</div>
+                <div style="font-size: 12px; color: #999; margin-top: 4px;">
+                  <span>{{ scope.row.description || '暂无描述' }}</span>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="180" align="center">
+              <template #default="scope">
+                <el-button
+                  type="primary"
+                  link
+                  @click="openSubtitleDialog(scope.row)"
+                >
+                  字幕管理
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+          </el-card>
+          <!-- 弹窗 -->
+          <el-dialog
+            v-model="subtitleDialogVisible"
+            :title="`字幕管理 - ${currentVideo?.title || ''}`"
+            width="500px"
+            @closed="handleDialogClose"
+          >
+            <el-upload
+              drag
+              :auto-upload="false"
+              accept=".json"
+              :on-change="handleFileChange2"
+              :limit="1"
+              ref="uploadRef"
+            >
+              <el-icon class="el-icon--upload"><Upload /></el-icon>
+              <div class="el-upload__text">
+                拖拽字幕 JSON 或 <em>点击上传</em>
+              </div>
+              <template #tip>
+                <div class="el-upload__tip">请确保上传的是合法的 JSON 格式字幕文件</div>
+              </template>
+            </el-upload>
+
+            <template #footer>
+              <span class="dialog-footer">
+                <el-button @click="subtitleDialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="submitSubtitle" :disabled="!subtitleFile">
+                  确认上传
+                </el-button>
+              </span>
+            </template>
+          </el-dialog>
+          <!-- 知识图谱管理 -->
+          <el-card v-if="activeMenu === '2'" class="import-card">
+            <template #header>
+              <div class="card-header">
+                <span>非遗知识图谱 - 自动化同步中枢</span>
+              </div>
+            </template>
+            <div class="upload-section">
+              <el-upload
+                class="upload-demo"
+                drag
+                action="#" 
+                :auto-upload="false"
+                :on-change="handleFileChange"
+                accept=".xlsx, .xls"
+              >
+                <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+                <div class="el-upload__text">将《晋剧知识.xlsx》拖到此处，或<em>点击上传</em></div>
+              </el-upload>
+            </div>
+            <el-button type="primary" @click="submitUpload" :loading="syncLoading" style="margin-top: 20px">
+                开始解析并同步到数据库
+            </el-button>
+          </el-card>
+          <!-- 用户管理 -->
+          <el-card v-if="activeMenu === '3'" class="user-card">
+            <template #header>
+              <div class="card-header">
+                <span>平台用户管理</span>
+                <el-button type="primary" size="small" @click="addDialogVisible = true">新增账号</el-button>
+              </div>
+            </template>
+            <el-table :data="mockUsers" stripe style="width: 100%">
+              <el-table-column prop="id" label="UID" width="80" />
+              <el-table-column label="头像" width="80">
+                <template #default="scope">
+                  <el-avatar :size="30" :src="scope.row.user_pic || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'" />
+                </template>
+              </el-table-column>
+              <el-table-column prop="username" label="用户名" />
+              <el-table-column label="身份标识">
+                <template #default="scope">
+                  <el-select 
+                    v-model="scope.row.user_type" 
+                    size="small"
+                    style="width: 120px;"
+                    @change="(val) => handleRoleChange(scope.row.id, val)"
+                  >
+                    <el-option label="普通研究员" :value="0" />
+                    <el-option label="系统管理员" :value="1" />
+                  </el-select>
+                </template>
+              </el-table-column>
+              <el-table-column label="操作" width="180">
+                <template #default="scope">
+                  <el-button size="small" link type="primary">编辑</el-button>
+                  <el-button 
+                    v-if="scope.row.user_type === 0"
+                    size="small" 
+                    link 
+                    type="danger" 
+                    @click="handleDeleteUser(scope.row)"
+                  >删除</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-card>
+          <!-- 添加用户弹窗 -->
+          <el-dialog v-model="addDialogVisible" title="添加用户" width="30%" @close="resetAddForm">
+            <el-form :model="addUserForm" :rules="addRules" ref="addUserRef" label-width="80px">
+              <el-form-item label="用户名" prop="username">
+                <el-input v-model="addUserForm.username" placeholder="请输入登录账号" />
+              </el-form-item>
+              <el-form-item label="初始密码" prop="password">
+                <el-input v-model="addUserForm.password" type="password" show-password placeholder="建议6位以上" />
+              </el-form-item>
+              <el-form-item label="身份权限">
+                <el-select v-model="addUserForm.user_type" placeholder="请选择">
+                  <el-option label="普通研究员" :value="0" />
+                  <el-option label="系统管理员" :value="1" />
+                </el-select>
+              </el-form-item>
+            </el-form>
+            <template #footer>
+              <el-button @click="addDialogVisible = false">取消</el-button>
+              <el-button type="primary" @click="submitAddUser" :loading="submitLoading">确认创建</el-button>
+            </template>
+          </el-dialog>
+        </el-main>
+      </el-container>
+    </el-container>
+  </div>
+</template>
+
+
 
 <style lang="scss" scoped>
 // 定义主题色变量，方便统一修改

@@ -14,7 +14,9 @@ import { cleanText } from '@/utils/cleanText.js'
 import { localTime } from '@/utils/timeTransform.js'
 import { useRouter } from 'vue-router'
 import { usechatAIstore } from '@/stores/chatAI.js'
-import fetchWrapper from '@/utils/fetchWrapper'
+
+// 语音开关
+const ENABLE_TTS = ref(false)   
 
 const chatAIstore = usechatAIstore()
 const { conversation_id } = storeToRefs(chatAIstore)
@@ -80,6 +82,7 @@ onMounted(async () => {
 
 // 3. 优化后的初始化音频系统 (只连一次)
 const initAudioSystem = async () => {
+    if (!ENABLE_TTS.value) return;
     if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
     if (audioContext.state === 'suspended') await audioContext.resume();
 
@@ -119,18 +122,17 @@ function animateLipSync() {
   const breath = (Math.sin(t * 1.5) + 1) / 2;
   model.internalModel.coreModel.setParameterValueById("ParamBreath", breath);
 
-
+  if (!ENABLE_TTS.value) {
+    return;
+  }
   if (!loading.value) {
-
     mouth *= 0.7; 
-    
     if (mouth < 0.01) {
         mouth = 0;
         model.internalModel.coreModel.setParameterValueById("ParamMouthOpenY", 0);
         model.internalModel.coreModel.setParameterValueById("ParamMouthForm", 0);
         return; 
     }
-
     model.internalModel.coreModel.setParameterValueById("ParamMouthOpenY", mouth);
     return;
   }
@@ -154,28 +156,8 @@ function animateLipSync() {
   model.internalModel.coreModel.setParameterValueById("ParamEyeBallY", eyeY);
 }
 
-
-  // model.motion("Idle", 0) // 01
-  // model.motion("Idle", 1) // 02
-  // model.motion("Idle", 2) // 05
-  // model.motion("Flick", 0) // 03
-  // model.motion("FlickDown", 0) // 04
-  // model.motion("Tap", 0) //06
-  // model.motion("Tap@Body", 0) //07
-  // model.motion("Flick@Body", 0) //08
-  // model.motion("mouthOpen", 0)
-
-
-  // 居中
-  // centerModel();
-  // resizeHandler = debounce(centerModel);
-  // window.addEventListener("resize", resizeHandler);
-
-  // // 你原来的初始化
-  // await chatAIstore.createConversation();
-  // await chatApi.initData();
-
 // --- 业务逻辑 ---
+
 const message = ref('')
 const inputValue = ref('')
 const loading = ref(false)
@@ -197,20 +179,25 @@ const addlist = async () => {
   const Usermessage = message.value;
   const chatAI = await chatApi.sendChatMessage(Usermessage, conversation_id.value);
   AImessage.value = cleanText(chatAI.data.answer);
+
   
   textList.value.push({
     id: ++id,
     user: Usermessage,
     AI: AImessage.value
   });
-  
+    console.log(textList.value);
   showTextbox.value.style.display = 'block';
   typeWriter(AImessage.value, showTextbox.value, 150);
-  // await TTS(AImessage.value);
+  loading.value = false
+  if (ENABLE_TTS.value) {
+    await TTS(AImessage.value);
+  }
 }
 
 const TTS = async (text) => {
   try {
+    if (!ENABLE_TTS.value) return;
       const response = await chatApi.textToSpeech(text);
       // 1. 处理 BaseURL：去掉末尾的斜杠
     const baseUrl = import.meta.env.VITE_APP_API_URL.replace(/\/$/, '');
@@ -268,6 +255,7 @@ const timestamp = ref([]);
 
 const handleCurrentAudio = async () => {
   // 1. 如果正在加载中，先不处理（防止重复点击叠加）
+  if (!ENABLE_TTS.value) return ;
   if (!AImessage.value) return
 
   try {
@@ -309,6 +297,8 @@ const handleCurrentAudio = async () => {
 
 const loadData = async () => {
   const response = await chatApi.getLoadList();
+  console.log(response.data);
+  
   response.data.forEach((i, index) => {
     if(i){
       title.value[index] = i.textList[i.textList.length - 1].user;
@@ -399,32 +389,7 @@ const saveData = async (slotIndex) => {
   background: url('@/assets/image/AI_bg.jpg') no-repeat;
   background-size: cover ;
 }
-// .bg {
-//   width: 100%;
-//   height: 100vh;
-//   position: fixed;
-//   top: 0;
-//   left: 0;
-//   z-index: -100;
-  
-//   // 1. 使用遮罩层防止背景太亮抢戏
-//   &::after {
-//     content: '';
-//     position: absolute;
-//     top: 0;
-//     left: 0;
-//     width: 100%;
-//     height: 100%;
-//     background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.1)); // 顶部加深
-//     pointer-events: none;
-//   }
 
-//   // 2. 增加轻微的模糊和缩放效果，提升交互感
-//   background: url('src/assets/image/AI_bg.jpg') no-repeat;
-//   background-size: cover;
-//   background-position: center;
-//   filter: brightness(0.8) contrast(1.1); // 降低亮度，提高对比度
-// }
 img {
   width: 100%;
   height: 100%;

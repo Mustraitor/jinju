@@ -6,8 +6,7 @@ import redis from '../config/redis.js'
 import { insertMessage, insertAudio, loadFullSlot } from '../model/saveData.js'
 import { v4 as uuidv4 } from 'uuid'
 import OpenAI from "openai";
-//新建对话
-
+const ENABLE_TTS = false; 
 
 // // 创建 GPT 客户端（支持第三方）
 // const openai = new OpenAI({
@@ -232,6 +231,13 @@ export const update_model = async (modelName) => {
 
 // 语音合成
 export const TTS = async (req, res) => {
+        if (!ENABLE_TTS) {
+        return res.json({
+            success: true,
+            disabled: true,   // 👈 告诉前端：语音关闭
+            url: null
+        });
+    }
     await update_model(modelName);
     const localSoundDir = path.join(process.cwd(), 'model/sound', modelName);
     const files = await fs.readdir(localSoundDir);
@@ -400,11 +406,11 @@ export const saveData = async (req, res) => {
   }
 
   // 3. 写入 audio
-  await pool.query(`DELETE FROM save_data_audio WHERE save_data_id = ?`, [saveDataId]);
-  for (const audio of data.audioUrl) {
-      await insertAudio(saveDataId, audio);
-  }
-  deleteTTSFile().catch(err => console.error("清理冗余文件失败:", err));
+//   await pool.query(`DELETE FROM save_data_audio WHERE save_data_id = ?`, [saveDataId]);
+//   for (const audio of data.audioUrl) {
+//       await insertAudio(saveDataId, audio);
+//   }
+//   deleteTTSFile().catch(err => console.error("清理冗余文件失败:", err));
   res.json({ message: 'success' });
 
 }
