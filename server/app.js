@@ -19,8 +19,7 @@ import config from './config/config.js'
 
 import path from 'path'
 import { fileURLToPath } from 'url'
-// import { runSovits } from './utils/runSovits.js';
-// runSovits() 
+import { initRefer } from './router_handler/chatAI.js'
 
 import { ensureAdminExists } from './utils/initAdmin.js'
  
@@ -31,8 +30,8 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));  
  
-
-app.use(express.json())
+ 
+app.use(express.json()) 
 
 
 app.use('/videos', express.static(path.join(process.cwd(), 'videos')));
@@ -122,6 +121,7 @@ app.use((err, req, res, next) => {
 })
 
 app.listen(8080, async () => {
-    console.log(`api server running at ${ config.BASE_URL } `);
+    // console.log(`api server running at ${ config.BASE_URL } `);
     await ensureAdminExists();
+    await initRefer();
 })

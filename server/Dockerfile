@@ -7,6 +7,8 @@ WORKDIR /app/server
 COPY package*.json ./
 RUN npm install --production
 
+# RUN apt-get update && apt-get install -y ffmpeg
+
 # 拷贝后端所有代码
 COPY . .
 

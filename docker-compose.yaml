@@ -1,18 +1,4 @@
 services:
-  # sovits:
-  #     image: xxxxrt666/gpt-sovits:cu128-lite-20250616-7dec5f
-  #     container_name: GPT-SoVITS-CU128
-  #     # 强制指定容器内的工作目录
-  #     working_dir: /workspace/GPT-SoVITS
-  #     volumes:
-  #       # 这里必须确保冒号左边是包含 api_v2.py 的那个文件夹
-  #       - ./GPT-SoVITS:/workspace/GPT-SoVITS
-  #     environment:
-  #       - is_half=true
-  #     # 【关键修改】：使用绝对路径启动，彻底解决“找不到文件”的问题
-  #     command: python /workspace/GPT-SoVITS/api_v2.py
-  #     runtime: nvidia
-  #     restart: unless-stopped
   db:
     image: mysql:8.0
     restart: always
@@ -41,7 +27,6 @@ services:
     environment:
       - DB_HOST=db
       - REDIS_HOST=redis
-      # - SOVITS_API_URL=http://sovits:9880
     ports:
       - "8080:8080"
     volumes:
@@ -50,6 +35,8 @@ services:
       - ./server/videos:/app/server/videos
       - ./server/covers:/app/server/covers
     restart: always
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   # 5. 前端服务 (Vue)
   frontend:

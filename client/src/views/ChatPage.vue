@@ -16,7 +16,7 @@ import { useRouter } from 'vue-router'
 import { usechatAIstore } from '@/stores/chatAI.js'
 
 // 语音开关
-const ENABLE_TTS = ref(false)   
+const ENABLE_TTS = ref(true)   
 
 const chatAIstore = usechatAIstore()
 const { conversation_id } = storeToRefs(chatAIstore)
@@ -189,47 +189,49 @@ const addlist = async () => {
     console.log(textList.value);
   showTextbox.value.style.display = 'block';
   typeWriter(AImessage.value, showTextbox.value, 150);
-  loading.value = false
+  // loading.value = false
   if (ENABLE_TTS.value) {
+    console.log("语音合成中");
+     
     await TTS(AImessage.value);
   }
 }
 
-// const TTS = async (text) => {
-//   try {
-//     if (!ENABLE_TTS.value) return;
-//       const response = await chatApi.textToSpeech(text);
-//       if (response?.disabled || !response?.filePath) {
-//         loading.value = false;
-//         return;
-//       }
-//       // 1. 处理 BaseURL：去掉末尾的斜杠
-//     const baseUrl = (import.meta.env.VITE_APP_API_URL || '').replace(/\/$/, '');
+const TTS = async (text) => {
+  try {
+    if (!ENABLE_TTS.value) return;
+      const response = await chatApi.textToSpeech(text);
+      if (response?.disabled || !response?.filePath) {
+        loading.value = false;
+        return;
+      }
+      // 1. 处理 BaseURL：去掉末尾的斜杠
+    const baseUrl = (import.meta.env.VITE_APP_API_URL || '').replace(/\/$/, '');
     
-//     // 2. 处理 FilePath：确保开头有一个斜杠
-//     const filePath = response.filePath.startsWith('/') 
-//                      ? response.filePath 
-//                      : `/${response.filePath}`;
+    // 2. 处理 FilePath：确保开头有一个斜杠
+    const filePath = response.filePath.startsWith('/') 
+                     ? response.filePath 
+                     : `/${response.filePath}`;
 
-//     const audioPath = `${baseUrl}${filePath}`;
+    const audioPath = `${baseUrl}${filePath}`;
   
-//       audioInstance.src = audioPath;
-//       audioInstance.onplay = () => { loading.value = true; };
-//       audioInstance.onended = () => { loading.value = false; };
-//       audioInstance.onerror = (e) => { 
-//           console.error("音频播放错", e); 
-//           loading.value = false; 
-//       };
+      audioInstance.src = audioPath;
+      audioInstance.onplay = () => { loading.value = true; };
+      audioInstance.onended = () => { loading.value = false; };
+      audioInstance.onerror = (e) => { 
+          console.error("音频播放错", e); 
+          loading.value = false; 
+      };
 
-//       await initAudioSystem();
-//       await audioInstance.play();
+      await initAudioSystem();
+      await audioInstance.play();
       
-//       saveTTS(response.filePath);
-//   } catch (e) {
-//       console.error("TTS Error", e);
-//       loading.value = false;
-//   }
-// }
+      saveTTS(response.filePath);
+  } catch (e) {
+      console.error("TTS Error", e);
+      loading.value = false;
+  }
+}
 
 const centerModel = () => {
   if (!app || !model) return;
